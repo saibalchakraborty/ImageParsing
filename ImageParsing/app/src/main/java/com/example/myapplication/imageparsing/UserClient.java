@@ -14,13 +14,13 @@ import retrofit2.http.Streaming;
 public interface UserClient {
 
     @Multipart
-    @POST("uploadfile/{id}")
+    @POST("upload/{id}")
     Call<PollAfter> uploadPhoto(@Part MultipartBody.Part imageFile, @Part("description") RequestBody description, @Path("id") String id);
 
     @Streaming
-    @GET("downloadFile/{id}")
+    @GET("downloads/{id}")
     Call<ResponseBody> downloadFileWithc(@Path("id") String id);
 
-    @GET("checkStatus/{id}")
+    @GET("status/{id}")
     Call<Result> getStatus(@Path("id") String id);
 }

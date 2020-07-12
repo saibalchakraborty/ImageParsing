@@ -13,6 +13,6 @@ public class ContactUs extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
-        getWindow().setLayout((int)(width), (int)(height*.5));
+        getWindow().setLayout((int)(.8*width), (int)(height*.4));
     }
 }

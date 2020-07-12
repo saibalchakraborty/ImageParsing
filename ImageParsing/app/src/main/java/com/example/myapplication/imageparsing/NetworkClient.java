@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetworkClient {
 
     private static Retrofit retrofit;
-    static final String BASE_URL = "http://10.0.2.2:8080/";
+    static final String BASE_URL = "https://agunerporosmoni.pythonanywhere.com";
 
     public static Retrofit getRetrofit(){
         OkHttpClient okHttpClient = new OkHttpClient.Builder()

@@ -7,97 +7,78 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="400dp"
-        android:layout_height="719dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="6dp"
-        android:layout_marginBottom="6dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp">
 
         <Button
             android:id="@+id/selectImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="20dp"
             android:text="Select Image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toTopOf="@+id/submitButton"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="157dp" />
 
         <Button
             android:id="@+id/submitButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:text="Submit"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/selectImage" />
+            app:layout_constraintTop_toBottomOf="@+id/selectImage"
+            tools:layout_editor_absoluteX="152dp" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="398dp"
-            android:layout_height="535dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="1dp"
+        <ImageView
+            android:id="@+id/myImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="176dp"
+            android:alpha="0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/submitButton">
+            app:layout_constraintTop_toBottomOf="@+id/submitButton"
+            app:srcCompat="@android:drawable/checkbox_off_background" />
 
-            <ImageView
-                android:id="@+id/myImage"
-                android:layout_width="match_parent"
-                android:layout_height="350dp"
-                android:layout_marginTop="50dp"
-                android:layout_marginBottom="111dp"
-                android:alpha="0"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@android:drawable/checkbox_off_background" />
+        <Button
+            android:id="@+id/buttonAbout"
+            android:layout_width="100dp"
+            android:layout_height="@android:dimen/notification_large_icon_height"
+            android:layout_marginBottom="50dp"
+            android:text="About"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="23dp"
-                android:layout_marginBottom="90dp"
-                android:text="Made in India with LOVE"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/buttonContactUs"
-                app:layout_constraintStart_toEndOf="@+id/buttonAbout"
-                app:layout_constraintTop_toBottomOf="@+id/myImage" />
+        <Button
+            android:id="@+id/buttonContactUs"
+            android:layout_width="100dp"
+            android:layout_height="@android:dimen/notification_large_icon_height"
+            android:layout_marginBottom="50dp"
+            android:text="Contact Us"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <Button
-                android:id="@+id/buttonAbout"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="70dp"
-                android:text="About"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/myImage" />
-
-            <Button
-                android:id="@+id/buttonContactUs"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="70dp"
-                android:text="Contact Us"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/myImage" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="130dp"
+            android:layout_marginEnd="131dp"
+            android:layout_marginBottom="20dp"
+            android:text="Made in India with LOVE"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

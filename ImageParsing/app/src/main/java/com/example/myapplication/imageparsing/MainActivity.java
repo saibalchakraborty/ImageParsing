@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String picturePath;
     private Uri path;
     private String id;
-    private final int delay = 3000;
+    private final int delay = 5000;
     private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
 
     @Override
@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.submitButton :
                 id = Long.toHexString(new Date().getTime());
                 if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED){
                     Log.i("Information : ", "Hurrah!! I have permision");
                     if(new UploadImage().uploadImage(path, this, id, this, picturePath)) {
                         new PollForImage().checkAvailabilityandDownload(delay, this, id);
@@ -94,12 +95,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void requestStoragePermission(Context context, final Activity activity) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            new AlertDialog.Builder(context).setTitle("Permission needed").setMessage("Need to access File Storage to upload files")
+                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.INTERNET)){
+            new AlertDialog.Builder(context).setTitle("Permission needed").setMessage("Need for uploading files to process")
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
@@ -109,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }).create().show();
         }
         else{
-            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
         }
     }
 
