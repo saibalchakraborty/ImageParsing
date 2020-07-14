@@ -13,7 +13,8 @@ public class PollForImage {
     private Handler handler = new Handler();
     private Retrofit retrofit;
     private UserClient client;
-    Context ctx;
+    private Context ctx;
+    private LoadingActivity loadingActivity;
     int timeDuration;
     String identity;
     private Runnable repeatInstanceThread= new Runnable() {
@@ -25,17 +26,21 @@ public class PollForImage {
                 public void onResponse(Call<Result> call, Response<Result> response) {
                     if(response.isSuccessful()) {
                         if(response.body().getStatus() !=0 ){
+                            Log.i("Imageparsing.info ", "File ready to downoad. Stopping polling activity");
                             exitCondition(response.body().getStatus());
                         }
                         else {
+                            Log.i("Imageparsing.info ", "Continue polling...");
                             handler.postDelayed(repeatInstanceThread, timeDuration);
                         }
                     }
+                    loadingActivity.dismissDialog("Stopped as response while polling was failure");
                 }
 
                 @Override
                 public void onFailure(Call call, Throwable t) {
-                    Log.e("Failure in polling :", t.getMessage());
+                    loadingActivity.dismissDialog("Stopped as polling failed");
+                    Log.e("Imageparsing.info :", t.getMessage());
                     Toast.makeText(ctx, "Failed to retrieve status", Toast.LENGTH_LONG).show();
                 }
             });
@@ -45,10 +50,12 @@ public class PollForImage {
     private void exitCondition(int status) {
         handler.removeCallbacks(repeatInstanceThread);
         if(status == 1){
-            new DownloadPDF().downloadPDF(identity);
+            new DownloadPDF().downloadPDF(identity, loadingActivity);
+            Log.i("Imageparsing.info ", "Success! Please check downloads folder.");
             Toast.makeText(ctx, "Success! Please check downloads folder.", Toast.LENGTH_LONG).show();
         }
         else{
+            Log.i("Imageparsing.info ", "Failed! Please upload a different/better file.");
             Toast.makeText(ctx, "Failed! Please upload a different/better file", Toast.LENGTH_LONG).show();
         }
     }
@@ -58,7 +65,9 @@ public class PollForImage {
         client = retrofit.create(UserClient.class);
     }
 
-    void checkAvailabilityandDownload(int duration, Context context, String id){
+    void checkAvailabilityandDownload(int duration, Context context, String id, LoadingActivity loadingActivity){
+        Log.i("Imageparsing.info ", "Polling started");
+        this.loadingActivity = loadingActivity;
         timeDuration = duration;
         identity = id;
         setup();

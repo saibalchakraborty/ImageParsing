@@ -22,34 +22,21 @@
             android:id="@+id/selectImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="175dp"
             android:layout_marginBottom="20dp"
-            android:text="Select Image"
-            app:layout_constraintBottom_toTopOf="@+id/submitButton"
+            android:text="Select Image To Upload"
+            app:layout_constraintBottom_toTopOf="@+id/openCamera"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="157dp" />
 
         <Button
-            android:id="@+id/submitButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Submit"
-            app:layout_constraintTop_toBottomOf="@+id/selectImage"
-            tools:layout_editor_absoluteX="152dp" />
-
-        <ImageView
-            android:id="@+id/myImage"
+            android:id="@+id/openCamera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:layout_marginBottom="176dp"
-            android:alpha="0"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/submitButton"
-            app:srcCompat="@android:drawable/checkbox_off_background" />
+            android:text="Open Camera"
+            app:layout_constraintTop_toBottomOf="@+id/selectImage"
+            tools:layout_editor_absoluteX="152dp" />
 
         <Button
             android:id="@+id/buttonAbout"

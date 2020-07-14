@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,24 +22,18 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button selectButton, uploadButton, aboutButton, contactUsButton;
-    private ImageView imageView;
-    private int img_req = 1;
-    private Bitmap bitmap;
-    String picturePath;
+    private Button selectButton, aboutButton, contactUsButton, openCamera;
+    private int gallery_img = 1, camera_img = 2, camera_request= 100, cam_code = 99;
+    private String picturePath;
     private Uri path;
-    private String id;
-    private final int delay = 5000;
-    private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,16 +42,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setup();
     }
 
+
     private void setup() {
         selectButton = findViewById(R.id.selectImage);
-        uploadButton = findViewById(R.id.submitButton);
         selectButton.setOnClickListener(this);
-        uploadButton.setOnClickListener(this);
-        imageView = findViewById(R.id.myImage);
         aboutButton = findViewById(R.id.buttonAbout);
         aboutButton.setOnClickListener(this);
         contactUsButton = findViewById(R.id.buttonContactUs);
         contactUsButton.setOnClickListener(this);
+        openCamera = findViewById(R.id.openCamera);
+        openCamera.setOnClickListener(this);
     }
 
     @Override
@@ -65,84 +60,80 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.selectImage :
                 selectImage();
                 break;
-            case R.id.submitButton :
-                id = Long.toHexString(new Date().getTime());
-                if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED){
-                    Log.i("Information : ", "Hurrah!! I have permision");
-                    if(new UploadImage().uploadImage(path, this, id, this, picturePath)) {
-                        new PollForImage().checkAvailabilityandDownload(delay, this, id);
-                    }
-                    else{
-                        Log.e("Issue in Upload : ",new UploadImage().getIssue().getLocalizedMessage());
-                    }
-                    imageView.animate().alpha(0f).setDuration(500);
-                }
-                else{
-                    Log.i("Information : ", "Requesting permission");
-                    requestStoragePermission(this, this);
-                }
-                break;
             case R.id.buttonAbout :
                 startActivity(new Intent(MainActivity.this, About.class));
                 break;
             case R.id.buttonContactUs :
                 startActivity(new Intent(MainActivity.this, ContactUs.class));
                 break;
+            case R.id.openCamera :
+                if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                    Log.i("Camera permission ", "Acess = true");
+                    openCamera();
+                }
+                else{
+                    requestCameraPermission(this, this);
+                }
         }
     }
 
-    private void requestStoragePermission(Context context, final Activity activity) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
-                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.INTERNET)){
-            new AlertDialog.Builder(context).setTitle("Permission needed").setMessage("Need for uploading files to process")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+    private void requestCameraPermission(Context context, final Activity activity) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA) &&
+                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            new AlertDialog.Builder(context).setTitle("Permission needed").setMessage("Need for clicking images to proceed")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener(){
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, camera_request);
                         }
-                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
                 }
             }).create().show();
         }
         else{
-            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, camera_request);
         }
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE){
-            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                Log.i("Information : ", "Atlast permission received"+ grantResults[0]+ " "+ grantResults[1]);
-                if(new UploadImage().uploadImage(path, this, id, this, picturePath)) {
-                    new PollForImage().checkAvailabilityandDownload(delay, this, id);
-                }
-                else{
-                    Log.e("Issue in Upload : ",new UploadImage().getIssue().getLocalizedMessage());
-                }
-                imageView.animate().alpha(0f).setDuration(500);
+        if (requestCode == camera_request) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                Log.i("Imageparsing.info : ", "Camera and file system permission granted" + grantResults[0] + " " + grantResults[1]);
+                openCamera();
             }
         }
     }
 
+    private void openCamera() {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "img1");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "New img from cam");
+        path = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent camIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Log.i("Imageparsing.info ", "Going to use img");
+        startActivityForResult(camIntent, cam_code);
+    }
+
     private void selectImage(){
+        Log.i("Imageparsing.info", "Image selection process started");
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(Intent.createChooser(intent, "Select Image"),img_req);
+        startActivityForResult(Intent.createChooser(intent, "Select gallery Image"),gallery_img);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == img_req && resultCode == RESULT_OK && data != null){
+        Log.i("Imageparsing.info", "req code : "+ requestCode + " resultCode : "+ resultCode + " data : "+ data);
+        if(requestCode == gallery_img && resultCode == RESULT_OK && data != null){
             path = data.getData();
             String value = data.getData().toString();
-            Log.d("Picture Path : ", value);
             String[] projection = {MediaStore.Images.Media.DATA};
             try {
                 String[] filePathColumn = { MediaStore.Images.Media.DATA };
@@ -150,14 +141,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 cursor.moveToFirst();
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 picturePath = cursor.getString(columnIndex);
-                Log.d("Picture Path : ", picturePath);
+                Log.i("Imageparsing.info", "taking image from gallery");
+                Log.i("Imageparsing.info : ", "path for image when taking from gallery [ "+picturePath+ " ]");
                 cursor.close();
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), path);
-                imageView.setImageBitmap((bitmap));
-                imageView.setVisibility(View.VISIBLE);
-                imageView.animate().alpha(1f).setDuration(500);
-                Log.i("Image selection : ","Image selected successfully");
-            } catch (IOException e) {
+                Intent intent = new Intent(this,ImageActivity.class);
+                intent.putExtra("file_path", picturePath);
+                startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if(requestCode == cam_code && resultCode == RESULT_OK && data != null){
+            try {
+                Log.i("Imageparsing.info", "taking image from camera directly");
+                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, bs);
+                Intent intent = new Intent(this,ImageActivity.class);
+                intent.putExtra("byteArray", bs.toByteArray());
+                startActivity(intent);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

@@ -29,33 +29,34 @@ import retrofit2.Retrofit;
 public class UploadImage extends ActivityCompat {
     boolean result = true;
     Throwable throwable;
-    private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
 
-    boolean uploadImage(Uri uri, final Context context, String id, Activity activity, String filePath)  {
-        File file = new File(filePath);
-        Log.i("URI Info : ", uri.getPath() + " file is : "+ file);
-
+    boolean uploadImage(final Context context, String id, Activity activity, File file, LoadingActivity loadingActivity)  {
         RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), "Image file");
         Retrofit retrofit = NetworkClient.getRetrofit();
         UserClient client = retrofit.create(UserClient.class);
+        Log.i("Imageparsing.info ", "Invoking upload of image : "+ part);
         Call<PollAfter> call = client.uploadPhoto(part, description, id);
         call.enqueue(new Callback<PollAfter>() {
             @Override
             public void onResponse(Call<PollAfter> call, Response<PollAfter> response) {
                 if(response.isSuccessful()){
-                    Log.v("Upload info :", response.body().getDescription());
+                    Log.v("Imageparsing.info :", response.body().getDescription());
                 }
                 else{
+                    Log.i("Imageparsing.info ", "Response not sucessfull [ "+ response.body().toString()+ " ]");
                     Toast.makeText(context, "Uploading failed!", Toast.LENGTH_LONG).show();
+                    loadingActivity.dismissDialog("Stopping due to failed response while submitting image");
                     triggerFailure(new Throwable(response.errorBody().toString()));
                 }
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
+                Log.i("Imageparsing.info ", "Call failed [ "+ t.getLocalizedMessage()+ " ]");
                 Toast.makeText(context, "Uploading failed!", Toast.LENGTH_LONG).show();
+                loadingActivity.dismissDialog("Stopping due to failure in uploading image");
                 triggerFailure(t);
             }
         });
