@@ -4,18 +4,26 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.widget.Toast;
 
 public class LoadingActivity extends AppCompatActivity{
 
     private Activity myActivity;
     private AlertDialog alertDialog;
+    private Context ctx;
 
     public LoadingActivity(){}
-    public LoadingActivity(Activity myActivity){
+    public LoadingActivity(Activity myActivity, Context ctx){
         this.myActivity = myActivity;
+        this.ctx = ctx;
     }
 
     @Override
@@ -36,7 +44,12 @@ public class LoadingActivity extends AppCompatActivity{
 
     void dismissDialog(String value){
         Log.i("Imageparsing.info ", "Stopping the loading dialog : " + value);
-        alertDialog.dismiss();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(ctx, value, Toast.LENGTH_LONG).show();
+                alertDialog.dismiss();
+                finish();
+            }
+        });
     }
-
 }

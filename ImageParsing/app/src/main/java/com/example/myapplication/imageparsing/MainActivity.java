@@ -1,39 +1,35 @@
 package com.example.myapplication.imageparsing;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button selectButton, aboutButton, contactUsButton, openCamera;
-    private int gallery_img = 1, camera_img = 2, camera_request= 100, cam_code = 99;
-    private String picturePath;
+    private int gallery_code = 1, cam_code = 2;
+    private int permissionGalery = 100, permissionCamera = 200;
+    private String picturePath, currentPhotoPath;
     private Uri path;
-    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         setup();
     }
-
 
     private void setup() {
         selectButton = findViewById(R.id.selectImage);
@@ -58,7 +53,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.selectImage :
-                selectImage();
+                String[] galleryPermissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+                if(!PermissionUtil.haspermission(this, galleryPermissions)){
+                    ActivityCompat.requestPermissions(this, galleryPermissions, permissionGalery);
+                }
+                else {
+                    selectImage();
+                }
                 break;
             case R.id.buttonAbout :
                 startActivity(new Intent(MainActivity.this, About.class));
@@ -67,71 +68,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(MainActivity.this, ContactUs.class));
                 break;
             case R.id.openCamera :
-                if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                    Log.i("Camera permission ", "Acess = true");
+                String[] cameraPermissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+                if(!PermissionUtil.haspermission(this, cameraPermissions)){
+                    ActivityCompat.requestPermissions(this, cameraPermissions, permissionCamera);
+                }
+                else {
                     openCamera();
                 }
-                else{
-                    requestCameraPermission(this, this);
-                }
-        }
-    }
-
-
-    private void requestCameraPermission(Context context, final Activity activity) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA) &&
-                ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            new AlertDialog.Builder(context).setTitle("Permission needed").setMessage("Need for clicking images to proceed")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, camera_request);
-                        }
-                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            }).create().show();
-        }
-        else{
-            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, camera_request);
-        }
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == camera_request) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                Log.i("Imageparsing.info : ", "Camera and file system permission granted" + grantResults[0] + " " + grantResults[1]);
-                openCamera();
-            }
+                break;
         }
     }
 
     private void openCamera() {
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "img1");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "New img from cam");
-        path = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         Intent camIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Log.i("Imageparsing.info ", "Going to use img");
-        startActivityForResult(camIntent, cam_code);
+        if (camIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
+                camIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(camIntent, cam_code);
+            }
+        }
+        else{
+            Log.i("Imageparsing.info ", "oeee the intent is null");
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName,".jpg",storageDir);
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
     private void selectImage(){
         Log.i("Imageparsing.info", "Image selection process started");
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(Intent.createChooser(intent, "Select gallery Image"),gallery_img);
+        startActivityForResult(Intent.createChooser(intent, "Select gallery Image"),gallery_code);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i("Imageparsing.info", "req code : "+ requestCode + " resultCode : "+ resultCode + " data : "+ data);
-        if(requestCode == gallery_img && resultCode == RESULT_OK && data != null){
+        if(requestCode == gallery_code && resultCode == RESULT_OK && data != null){
             path = data.getData();
             String value = data.getData().toString();
             String[] projection = {MediaStore.Images.Media.DATA};
@@ -145,20 +141,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.i("Imageparsing.info : ", "path for image when taking from gallery [ "+picturePath+ " ]");
                 cursor.close();
                 Intent intent = new Intent(this,ImageActivity.class);
-                intent.putExtra("file_path", picturePath);
+                intent.putExtra("path", picturePath);
                 startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if(requestCode == cam_code && resultCode == RESULT_OK && data != null){
+        if(requestCode == cam_code && resultCode == RESULT_OK){
             try {
                 Log.i("Imageparsing.info", "taking image from camera directly");
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, bs);
+                galleryAddPic();
                 Intent intent = new Intent(this,ImageActivity.class);
-                intent.putExtra("byteArray", bs.toByteArray());
+                intent.putExtra("path", currentPhotoPath);
                 startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.example.myapplication.imageparsing;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -17,6 +18,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class DownloadPDF {
+
     void downloadPDF(String identity, LoadingActivity loadingActivity) {
         Log.i("Imageparsing.info ", "downloading file with id "+identity);
         Retrofit retrofit = NetworkClient.getRetrofit();
@@ -33,7 +35,7 @@ public class DownloadPDF {
                         protected Void doInBackground(Void... voids) {
                             boolean writtenToDisk = writeResponseBodyToDisk((ResponseBody) response.body());
                             Log.i("Imageparsing.info : ", "writting to disk : "+writtenToDisk);
-                            loadingActivity.dismissDialog("Stoping due to Image successfully being written to disk");
+                            loadingActivity.dismissDialog("Success! Please check downloads folder");
                             return null;
                         }
                     }.execute();
@@ -43,7 +45,7 @@ public class DownloadPDF {
             @Override
             public void onFailure(Call call, Throwable t) {
                 Log.i("Imageparsing.info : ", "Failed to get PDF file due to : "+t.getLocalizedMessage());
-                loadingActivity.dismissDialog("Failure during downloading file");
+                loadingActivity.dismissDialog("File download failed");
             }
         });
     }
@@ -68,7 +70,7 @@ public class DownloadPDF {
                     }
                     outputStream.write(fileReader, 0, read);
                     fileSizeDownloaded += read;
-                    Log.d("Imageparsing.info: ", fileSizeDownloaded + " of " + fileSize);
+                    Log.i("Imageparsing.info: ", fileSizeDownloaded + " of " + fileSize);
                     outputStream.flush();
                 }
             } catch (IOException e) {

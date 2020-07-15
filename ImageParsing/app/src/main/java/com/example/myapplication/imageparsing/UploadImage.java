@@ -1,23 +1,11 @@
 package com.example.myapplication.imageparsing;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -26,7 +14,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class UploadImage extends ActivityCompat {
+public class UploadImage {
     boolean result = true;
     Throwable throwable;
 
@@ -46,17 +34,15 @@ public class UploadImage extends ActivityCompat {
                 }
                 else{
                     Log.i("Imageparsing.info ", "Response not sucessfull [ "+ response.body().toString()+ " ]");
-                    Toast.makeText(context, "Uploading failed!", Toast.LENGTH_LONG).show();
-                    loadingActivity.dismissDialog("Stopping due to failed response while submitting image");
-                    triggerFailure(new Throwable(response.errorBody().toString()));
+                    loadingActivity.dismissDialog("Stopped as server rejected image. Pls try again");
                 }
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
                 Log.i("Imageparsing.info ", "Call failed [ "+ t.getLocalizedMessage()+ " ]");
-                Toast.makeText(context, "Uploading failed!", Toast.LENGTH_LONG).show();
-                loadingActivity.dismissDialog("Stopping due to failure in uploading image");
+                Toast.makeText(context, "Stopping as server is down/not available. Pls try later", Toast.LENGTH_SHORT).show();
+                loadingActivity.dismissDialog("server is down/not available");
                 triggerFailure(t);
             }
         });

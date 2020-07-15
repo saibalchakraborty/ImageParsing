@@ -3,20 +3,23 @@ package com.example.myapplication.imageparsing;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class PollForImage {
+public class PollForImage extends AppCompatActivity {
     private Handler handler = new Handler();
     private Retrofit retrofit;
     private UserClient client;
     private Context ctx;
     private LoadingActivity loadingActivity;
     int timeDuration;
-    String identity;
+    private String identity;
+
     private Runnable repeatInstanceThread= new Runnable() {
         @Override
         public void run() {
@@ -34,14 +37,12 @@ public class PollForImage {
                             handler.postDelayed(repeatInstanceThread, timeDuration);
                         }
                     }
-                    loadingActivity.dismissDialog("Stopped as response while polling was failure");
                 }
 
                 @Override
                 public void onFailure(Call call, Throwable t) {
-                    loadingActivity.dismissDialog("Stopped as polling failed");
+                    loadingActivity.dismissDialog("Server didnt send document back");
                     Log.e("Imageparsing.info :", t.getMessage());
-                    Toast.makeText(ctx, "Failed to retrieve status", Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -52,11 +53,10 @@ public class PollForImage {
         if(status == 1){
             new DownloadPDF().downloadPDF(identity, loadingActivity);
             Log.i("Imageparsing.info ", "Success! Please check downloads folder.");
-            Toast.makeText(ctx, "Success! Please check downloads folder.", Toast.LENGTH_LONG).show();
         }
         else{
             Log.i("Imageparsing.info ", "Failed! Please upload a different/better file.");
-            Toast.makeText(ctx, "Failed! Please upload a different/better file", Toast.LENGTH_LONG).show();
+            loadingActivity.dismissDialog("Failed! Please upload a different/better file.");
         }
     }
 
