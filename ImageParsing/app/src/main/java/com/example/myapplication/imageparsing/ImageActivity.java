@@ -10,10 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 
 public class ImageActivity extends AppCompatActivity implements View.OnClickListener{
@@ -23,7 +23,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
     private ImageView imageView;
     private final int delay = 4000;
     private LoadingActivity loadingActivity;
-    private File file;
+    private File file, uploadFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +44,20 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
         imageView.animate().alpha(1f).setDuration(500);
         Log.i("Imageparsing.info : ","Image from gallery selected and displayed successfully");
         file = new File(picturePath);
+
+        //part adding extra to support image compression
+        try {
+            Log.i("Imageparsing.info ", "File size before compressing "+file.length()/1024 + "Kb");
+            Bitmap bmap = BitmapFactory.decodeFile(file.getName());
+            OutputStream outStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, outStream);
+            outStream.flush();
+            outStream.close();
+            Log.i("Imageparsing.info ", "File size before compressing "+file.length()/1024 + "Kb");
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

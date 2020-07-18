@@ -11,6 +11,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,8 +55,11 @@ public class DownloadPDF {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private boolean writeResponseBodyToDisk(ResponseBody body) {
         Log.i("Imageparsing.info ", "Trying to write the pdf to device");
+        //file name modification (Take current system time)
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String strDate = sdfDate.format(new Date());
         try {
-            File futureStudioIconFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "result.pdf");
+            File futureStudioIconFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Scanned_Result_"+strDate+".pdf");
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
