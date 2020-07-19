@@ -37,7 +37,7 @@ public class DownloadPDF {
                         protected Void doInBackground(Void... voids) {
                             boolean writtenToDisk = writeResponseBodyToDisk((ResponseBody) response.body());
                             Log.i("Imageparsing.info : ", "writting to disk : "+writtenToDisk);
-                            loadingActivity.dismissDialog("Success! Please check downloads folder");
+                            loadingActivity.dismissDialog("Success! Please check Scanocle folder");
                             return null;
                         }
                     }.execute();
@@ -59,7 +59,13 @@ public class DownloadPDF {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String strDate = sdfDate.format(new Date());
         try {
-            File futureStudioIconFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Scanned_Result_"+strDate+".pdf");
+            String filepath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Scanocle";
+            File dir = new File(filepath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            //File futureStudioIconFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Scanned_Result_"+strDate+".pdf");
+            File futureStudioIconFile = new File(filepath, "Scanned_Result_"+strDate+".pdf");
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {

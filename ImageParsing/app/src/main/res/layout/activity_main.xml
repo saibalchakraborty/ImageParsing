@@ -63,7 +63,7 @@
             android:layout_marginStart="130dp"
             android:layout_marginEnd="131dp"
             android:layout_marginBottom="20dp"
-            android:text="Made in India with LOVE"
+            android:text="Be Atma-nirbhar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

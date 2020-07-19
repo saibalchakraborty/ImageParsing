@@ -50,7 +50,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
             Log.i("Imageparsing.info ", "File size before compressing "+file.length()/1024 + "Kb");
             Bitmap bmap = BitmapFactory.decodeFile(file.getName());
             OutputStream outStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, outStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 40, outStream);
             outStream.flush();
             outStream.close();
             Log.i("Imageparsing.info ", "File size before compressing "+file.length()/1024 + "Kb");
