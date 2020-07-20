@@ -1,5 +1,6 @@
 package com.example.myapplication.imageparsing;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -10,6 +11,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -17,8 +20,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class DownloadPDF {
-    void downloadPDF(String identity) {
-        Log.i("Info ; ", "downloading file with id "+identity);
+
+    void downloadPDF(String identity, LoadingActivity loadingActivity) {
+        Log.i("Imageparsing.info ", "downloading file with id "+identity);
         Retrofit retrofit = NetworkClient.getRetrofit();
         UserClient client = retrofit.create(UserClient.class);
         Call call = client.downloadFileWithc(identity);
@@ -32,7 +36,8 @@ public class DownloadPDF {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             boolean writtenToDisk = writeResponseBodyToDisk((ResponseBody) response.body());
-                            Log.i("Status : ", "writting to disk : "+writtenToDisk);
+                            Log.i("Imageparsing.info : ", "writting to disk : "+writtenToDisk);
+                            loadingActivity.dismissDialog("Success! Please check Scanocle folder");
                             return null;
                         }
                     }.execute();
@@ -41,16 +46,26 @@ public class DownloadPDF {
 
             @Override
             public void onFailure(Call call, Throwable t) {
-                Log.i("Failed to get PDF : ", t.getLocalizedMessage());
+                Log.i("Imageparsing.info : ", "Failed to get PDF file due to : "+t.getLocalizedMessage());
+                loadingActivity.dismissDialog("File download failed");
             }
         });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private boolean writeResponseBodyToDisk(ResponseBody body) {
-        Log.i("Info", "Trying to write the pdf to device");
+        Log.i("Imageparsing.info ", "Trying to write the pdf to device");
+        //file name modification (Take current system time)
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String strDate = sdfDate.format(new Date());
         try {
-            File futureStudioIconFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "result.pdf");
+            String filepath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Scanocle";
+            File dir = new File(filepath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            //File futureStudioIconFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Scanned_Result_"+strDate+".pdf");
+            File futureStudioIconFile = new File(filepath, "Scanned_Result_"+strDate+".pdf");
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
@@ -66,7 +81,7 @@ public class DownloadPDF {
                     }
                     outputStream.write(fileReader, 0, read);
                     fileSizeDownloaded += read;
-                    Log.d("File Download: ", fileSizeDownloaded + " of " + fileSize);
+                    Log.i("Imageparsing.info: ", fileSizeDownloaded + " of " + fileSize);
                     outputStream.flush();
                 }
             } catch (IOException e) {
