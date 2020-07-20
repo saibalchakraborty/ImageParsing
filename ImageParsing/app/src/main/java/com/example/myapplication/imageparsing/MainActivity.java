@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 picturePath = cursor.getString(columnIndex);
                 Log.i("Imageparsing.info", "taking image from gallery");
-                Log.i("Imageparsing.info : ", "path for image when taking from gallery [ "+picturePath+ " ]");
+                Log.i("Imageparsing.info : ", "path for image when taking from gallery ["+picturePath+ "]");
                 cursor.close();
                 Intent intent = new Intent(this,ImageActivity.class);
                 intent.putExtra("path", picturePath);

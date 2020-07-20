@@ -38,6 +38,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
     private void processImage(Intent intent){
         String picturePath = intent.getStringExtra("path");
         imageView = findViewById(R.id.myImage);
+        Log.i("Imageparsing.info ", "The path is : "+ picturePath);
         Bitmap bitmap= BitmapFactory.decodeFile(picturePath);
         imageView.setImageBitmap((bitmap));
         imageView.setVisibility(View.VISIBLE);
