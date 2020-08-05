@@ -2,70 +2,73 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/imageView"
+    android:id="@+id/homeView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <include
+        layout="@layout/appbar"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp">
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
-            android:id="@+id/selectImage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="175dp"
-            android:layout_marginBottom="20dp"
-            android:text="Select Image To Upload"
-            app:layout_constraintBottom_toTopOf="@+id/openCamera"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="157dp" />
-
-        <Button
-            android:id="@+id/openCamera"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:text="Open Camera"
-            app:layout_constraintTop_toBottomOf="@+id/selectImage"
-            tools:layout_editor_absoluteX="152dp" />
-
-        <Button
-            android:id="@+id/buttonAbout"
-            android:layout_width="100dp"
-            android:layout_height="@android:dimen/notification_large_icon_height"
-            android:layout_marginBottom="50dp"
-            android:text="About"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:id="@+id/buttonContactUs"
-            android:layout_width="100dp"
-            android:layout_height="@android:dimen/notification_large_icon_height"
-            android:layout_marginBottom="50dp"
-            android:text="Contact Us"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:id="@+id/textView"
+            android:id="@+id/submitButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="130dp"
-            android:layout_marginEnd="131dp"
-            android:layout_marginBottom="20dp"
-            android:text="Be Atma-nirbhar"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/sendbutton"
+            android:text="Send"
+            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/selectImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/selectionbutton"
+            android:text="Gallery"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toTopOf="@+id/submitButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/openCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/selectionbutton"
+            android:text="Camera"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toTopOf="@+id/submitButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/homeimageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:alpha="0.3"
+        android:cropToPadding="false"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/myappbar"
+        app:srcCompat="@drawable/scanbground" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

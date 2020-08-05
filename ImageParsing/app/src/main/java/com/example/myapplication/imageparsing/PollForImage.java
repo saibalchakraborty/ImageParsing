@@ -1,8 +1,10 @@
 package com.example.myapplication.imageparsing;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +21,8 @@ public class PollForImage extends AppCompatActivity {
     private LoadingActivity loadingActivity;
     int timeDuration;
     private String identity;
+    private ImageView imageView;
+    private Activity activity;
 
     private Runnable repeatInstanceThread= new Runnable() {
         @Override
@@ -51,7 +55,7 @@ public class PollForImage extends AppCompatActivity {
     private void exitCondition(int status) {
         handler.removeCallbacks(repeatInstanceThread);
         if(status == 1){
-            new DownloadPDF().downloadPDF(identity, loadingActivity);
+            new DownloadPDF().downloadPDF(identity, loadingActivity, activity, ctx);
             Log.i("Imageparsing.info ", "Success! Please check downloads folder.");
         }
         else{
@@ -65,13 +69,15 @@ public class PollForImage extends AppCompatActivity {
         client = retrofit.create(UserClient.class);
     }
 
-    void checkAvailabilityandDownload(int duration, Context context, String id, LoadingActivity loadingActivity){
+    void checkAvailabilityandDownload(int duration, Context context, String id, LoadingActivity loadingActivity, ImageView imageView, Activity activity){
         Log.i("Imageparsing.info ", "Polling started");
+        this.imageView = imageView;
         this.loadingActivity = loadingActivity;
+        this.activity = activity;
+        ctx = context;
         timeDuration = duration;
         identity = id;
         setup();
-        ctx = context;
         handler.postDelayed(repeatInstanceThread, timeDuration);
     }
 }

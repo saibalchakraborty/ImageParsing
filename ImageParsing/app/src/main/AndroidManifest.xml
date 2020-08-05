@@ -17,8 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ImageActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
         <activity android:name=".LoadingActivity" />
         <activity
             android:name=".HomeActivity"
@@ -36,8 +37,8 @@
             android:name=".About"
             android:theme="@style/AppTheme.CustomTheme" />
         <provider
-            android:authorities="com.example.android.fileprovider"
-            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.myapplication.imageparsing.provider"
+            android:name=".GenericFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
         <meta-data
